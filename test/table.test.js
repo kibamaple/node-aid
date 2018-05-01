@@ -1,6 +1,6 @@
-const Table = require('../../src/utils/table');
+const Table = require('../src/table');
 
-describe('utils/table',()=>{
+describe('table',()=>{
 
     describe('length',()=>{
         

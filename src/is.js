@@ -10,7 +10,8 @@ let {
     fn,
     regexp,
     hex,
-    date
+    date,
+    undef
 } = Is;
 
 module.exports = {
@@ -24,5 +25,6 @@ module.exports = {
     fn,
     regexp,
     hex,
-    date
+    date,
+    undef
 };
