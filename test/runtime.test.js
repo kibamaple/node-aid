@@ -1,13 +1,13 @@
-const Route = require('../src/route');
+const Runtime = require('../src/runtime');
 
-const {koa} = Route,
+const {koa} = Runtime,
     app = Symbol('app'),
     path = Symbol('path'),
     method = Symbol('method'),
     error = new Error(),
     errorFn = ()=>{throw error;};
 
-describe('route',()=>{
+describe('runtime',()=>{
 
     describe('koa',()=>{
 
