@@ -11,7 +11,8 @@ let {
     regexp,
     hex,
     date,
-    undef
+    undef,
+    defined
 } = Is;
 
 module.exports = {
@@ -26,5 +27,6 @@ module.exports = {
     regexp,
     hex,
     date,
-    undef
+    undef,
+    defined
 };

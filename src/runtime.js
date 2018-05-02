@@ -1,17 +1,23 @@
 const Is = require('./is');
 const {undef,fn} = Is;
 
-async function exec (path,method,load,handle){
-    const app = await load(path,method);
-    return undef(app)?app:await handle(app);
+async function exec (check,path,method,route,...handles){
+    const app = await route(path,method);
+    let handle,respond;
+    if(undef(app))
+        return app;
+    for(handle of handles)
+        if(check(respond = await handle(app)))
+            break;
+    return respond;
 }
 
-exports.koa = (load,handle)=>{
+exports.koa = (route,...handles)=>{
 
     return async (ctx,next) => {
         const {path,method} = ctx,
-            respond = await exec(path,method,load,handle);
-        return fn(respond)?respond(ctx,next):next();
+            respond = await exec(fn,path,method,route,...handles);
+        return respond?respond(ctx,next):next();
     }
 
 };

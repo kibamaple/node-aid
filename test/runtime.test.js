@@ -1,5 +1,4 @@
 const Runtime = require('../src/runtime');
-
 const {koa} = Runtime,
     app = Symbol('app'),
     path = Symbol('path'),
@@ -11,45 +10,45 @@ describe('runtime',()=>{
 
     describe('koa',()=>{
 
-        it('load undefined',async ()=>{
+        it('route undefined',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
-            load.mockReturnValue(undefined);
+            route.mockReturnValue(undefined);
             await mw(ctx,next);
 
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(0);
             expect(next).toHaveBeenCalledTimes(1);
         });
 
         it('handle undefined',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
-            load.mockReturnValue(app);
+            route.mockReturnValue(app);
             await mw(ctx,next);
 
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(1);
             expect(handle).toHaveBeenCalledWith(app);
             expect(next).toHaveBeenCalledTimes(1);
         });
         
-        it('load undefined with next error',async ()=>{
+        it('route undefined with next error',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(errorFn),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
             let err;
             try{
@@ -59,20 +58,20 @@ describe('runtime',()=>{
             }
             
             expect(err).toBe(error);
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(0);
             expect(next).toHaveBeenCalledTimes(1);
         });
         
         it('handle undefined with next error',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(errorFn),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
-            load.mockReturnValue(app);
+            route.mockReturnValue(app);
             let err;
             try{
                 await mw(ctx,next);
@@ -81,19 +80,19 @@ describe('runtime',()=>{
             }
             
             expect(err).toBe(error);
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(1);
             expect(handle).toHaveBeenCalledWith(app);
             expect(next).toHaveBeenCalledTimes(1);
         });
         
-        it('load error',async ()=>{
+        it('route error',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(errorFn),
+                route = jest.fn(errorFn),
                 next = jest.fn(),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
             let err;
             try{
@@ -103,20 +102,20 @@ describe('runtime',()=>{
             }
             
             expect(err).toBe(error);
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(0);
             expect(next).toHaveBeenCalledTimes(0);
         });
 
         it('handle error',async ()=>{
             const handle = jest.fn(errorFn),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
             
-            load.mockReturnValue(app);
+            route.mockReturnValue(app);
             let err;
             try{
                 await mw(ctx,next);
@@ -125,8 +124,8 @@ describe('runtime',()=>{
             }
             
             expect(err).toBe(error);
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(1);
             expect(handle).toHaveBeenCalledWith(app);
             expect(next).toHaveBeenCalledTimes(0);
@@ -134,13 +133,13 @@ describe('runtime',()=>{
 
         it('respond error',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(),
                 respond = jest.fn(errorFn),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
-            load.mockReturnValue(app);
+            route.mockReturnValue(app);
             handle.mockReturnValue(respond);
             let err;
             try{
@@ -150,8 +149,8 @@ describe('runtime',()=>{
             }
             
             expect(err).toBe(error);
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(1);
             expect(handle).toHaveBeenCalledWith(app);
             expect(respond).toHaveBeenCalledTimes(1);
@@ -162,18 +161,18 @@ describe('runtime',()=>{
 
         it('complete',async ()=>{
             const handle = jest.fn(),
-                load = jest.fn(),
+                route = jest.fn(),
                 next = jest.fn(),
                 respond = jest.fn(),
                 ctx = {path,method},
-                mw = koa(load,handle);
+                mw = koa(route,handle);
 
-            load.mockReturnValue(app);
+            route.mockReturnValue(app);
             handle.mockReturnValue(respond);
             await mw(ctx,next);
             
-            expect(load).toHaveBeenCalledTimes(1);
-            expect(load).toHaveBeenCalledWith(path,method);
+            expect(route).toHaveBeenCalledTimes(1);
+            expect(route).toHaveBeenCalledWith(path,method);
             expect(handle).toHaveBeenCalledTimes(1);
             expect(handle).toHaveBeenCalledWith(app);
             expect(respond).toHaveBeenCalledTimes(1);

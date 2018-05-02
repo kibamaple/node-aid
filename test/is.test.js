@@ -11,7 +11,8 @@ const {
     regexp,
     hex,
     date,
-    undef
+    undef,
+    defined
 } = Is;
 
 describe('is',()=>{
@@ -110,6 +111,14 @@ describe('is',()=>{
     
     it('undefined check failed',()=>{
         expect(undef('wxyzWXYZ1234/+==')).toBeFalsy();
+    });
+    
+    it('defined check success',()=>{
+        expect(defined(123)).toBeTruthy();
+    });
+    
+    it('defined check failed',()=>{
+        expect(defined(undefined)).toBeFalsy();
     });
 
 });
