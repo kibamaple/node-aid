@@ -8,7 +8,10 @@ function $mapping(params,ctx){
     for([key, value] of entries(params))
         if(object(obj = ctx[key]))    
             for(name of value)
-                if(obj.hasOwnProperty(name))
+                if(
+                    !_ctx.hasOwnProperty(name) 
+                    && obj.hasOwnProperty(name)
+                )
                     _ctx[name] = obj[name];
     return _ctx;
 }
@@ -17,7 +20,10 @@ function $get (key,target,...args) {
     let value,arg;
     if(!target.hasOwnProperty(key)){
         for(arg of args)
-            if(object(arg) && arg.hasOwnProperty(key)){
+            if(
+                object(arg)
+                && arg.hasOwnProperty(key)
+            ){
                 value = arg[key];
                 break;
             }
