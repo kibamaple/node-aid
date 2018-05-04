@@ -13,14 +13,18 @@ function $mapping(params,ctx){
     return _ctx;
 }
 
-function $get (key,...args) {
+function $get (key,target,...args) {
     let value,arg;
-    for(arg of args)
-        if(arg.hasOwnProperty(key)){
-            value = arg[key];
-            break;
-        }
-    return value;
+    if(!target.hasOwnProperty(key)){
+        for(arg of args)
+            if(object(arg) && arg.hasOwnProperty(key)){
+                value = arg[key];
+                break;
+            }
+        target[key] = value;
+    }
+
+    return target[key];
 }
 
 exports.koa = (app,ctx)=>{
