@@ -16,7 +16,9 @@ describe('context',()=>{
                 app = jest.fn(),
                 context = koa(app,ctx);
             
-            expect(context).toEqual({param1,param2,param3});
+            expect(context.param1).toEqual(param1);
+            expect(context.param2).toEqual(param2);
+            expect(context.param3).toEqual(param3);
             expect(app).toHaveBeenCalledTimes(0);
         });
 
@@ -31,11 +33,13 @@ describe('context',()=>{
                 app = jest.fn(),
                 context = koa(app,ctx);
             
-            expect(context).toEqual({param1,param2,param3});
-            expect(app).toHaveBeenCalledTimes(0);
+                expect(context.param1).toEqual(param1);
+                expect(context.param2).toEqual(param2);
+                expect(context.param3).toEqual(param3);
+                expect(app).toHaveBeenCalledTimes(0);
         });
 
-        it('app $params',()=>{
+        it('app assign',()=>{
             const param1 = Symbol('param1'),
                 param2 = Symbol('param2'),
                 param3 = Symbol('param3'),
