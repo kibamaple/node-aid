@@ -9,6 +9,8 @@ async function handle (ctx,app,context,...views){
     for(view of views)
         if(defined(respond = view(ctx,result)))
             break;
+    if(undef(respond))
+        throw new Error(message+JSON.stringify(result));
     return respond;
 }
 
@@ -18,8 +20,6 @@ exports.koa = (context,...views)=>{
         if (fn(app)){
             return async (ctx,next)=>{
                 const respond = await handle(ctx,app,context,...views);
-                if(undef(respond))
-                    throw new Error(message+JSON.stringify(data));
                 if(fn(respond))
                     return await respond(next);
                 if(respond !== true)

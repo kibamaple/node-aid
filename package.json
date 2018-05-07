@@ -1,6 +1,6 @@
 {
-    "name": "ktlib",
-    "description": "kiba tools Library",
+    "name": "sllib",
+    "description": "simple logic library",
     "version": "0.1.0",
     "private": true,
     "scripts": {

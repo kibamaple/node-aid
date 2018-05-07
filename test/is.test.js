@@ -12,7 +12,8 @@ const {
     hex,
     date,
     undef,
-    defined
+    defined,
+    error
 } = Is;
 
 describe('is',()=>{
@@ -119,6 +120,14 @@ describe('is',()=>{
     
     it('defined check failed',()=>{
         expect(defined(undefined)).toBeFalsy();
+    });
+
+    it('error check success',()=>{
+        expect(error(new Error())).toBeTruthy();
+    });
+    
+    it('error check failed',()=>{
+        expect(error(undefined)).toBeFalsy();
     });
 
 });

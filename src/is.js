@@ -12,7 +12,8 @@ let {
     hex,
     date,
     undef,
-    defined
+    defined,
+    error
 } = Is;
 
 module.exports = {
@@ -28,5 +29,6 @@ module.exports = {
     hex,
     date,
     undef,
-    defined
+    defined,
+    error
 };

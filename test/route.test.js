@@ -1,141 +1,190 @@
-const method = 'METHOD',
-    error = new Error(),
-    errorFn = ()=>{throw error;}
-    modules = [
-        ['normal',{method}],
-        ['path/normal',{method}],
-        ['path/test/index',{method}],
-        ['non',{}],
-        ['error',errorFn],
-        ['error/method',()=>errorFn]
-    ],
-    ext = '.js',
-    glob = jest.fn(
-        (p,o,cb) => cb(
-            null, 
-            modules.map(_=>_[0] + ext)
-        )
-    );
-jest.doMock('glob',()=>glob);
+const traverse = jest.fn(),
+    opts = {virtual: true};
 
-const Route = require('../src/route'),
-    Is = require('../src/is');
+jest.doMock('../src/js',()=>({traverse}),opts);
+const Route = require('../src/route');
+jest.dontMock('../src/js');
+
 const {search} = Route,
-    {fn} = Is,
     current = '.',
-    sep = '/',
     root = __dirname,
-    pattern = '**/*.js',
-    opts = {cwd:root};
-
-jest.dontMock('glob');
+    method = 'METHOD',
+    name = 'name',
+    slash = '/',
+    s_name = slash+name,
+    c_name = current + s_name,
+    f_name = name+'.js',
+    error = new Error(),
+    errorFn = ()=>{throw error;};
 
 describe('route',()=>{
     
     describe('search',()=>{
 
-        beforeAll(()=>{
-            for(let module of modules)
-                jest.doMock(
-                    [current,module[0]].join(sep),
-                    fn(module[1])?module[1]:()=>module[1],
-                    {virtual: true}
-                );
-        });
-        
-        afterAll(()=>{
-            for(let module of modules)
-                jest.dontMock(
-                    [current,module[0]].join(sep)
-                );
+        afterEach(()=>{
+            traverse.mockReset();
+            jest.resetModules();
         });
 
-        afterEach(() => {
-            glob.mockClear();
+        it('not found module with empty',async ()=>{
+            traverse.mockResolvedValue([]);
+            const route = search(root),
+                app = await route(name,method),
+                app1 = await route(s_name,method);
+
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+            expect(app).toBeUndefined();
+            expect(app1).toBeUndefined();
         });
 
         it('not found module',async ()=>{
-            const route = search(root);
-            
-            const app = await route('/',method),
-                app1 = await route('/',method);
+            traverse.mockResolvedValue(['index.js']);
+            const route = search(root),
+                app = await route(name,method),
+                app1 = await route(s_name,method);
 
-            expect(glob).toHaveBeenCalledTimes(1);
-            expect(glob).toHaveBeenCalledWith(pattern,opts,expect.anything());
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
             expect(app).toBeUndefined();
             expect(app1).toBeUndefined();
         });
 
         it('not found method',async ()=>{
+            const fy = jest.fn();
+
+            traverse.mockResolvedValue([f_name]);
             const route = search(root);
             
-            const app = await route(modules[3][0],method),
-                app1 = await route(modules[3][0],method);
+            jest.doMock(c_name,()=>({}),opts);
+            const app = await route(name,method);
+            jest.dontMock(c_name);
+            jest.resetModules();
 
-            expect(glob).toHaveBeenCalledTimes(1);
-            expect(glob).toHaveBeenCalledWith(pattern,opts,expect.anything());
+            jest.doMock(c_name,()=>fy,opts);
+            const app1 = await route(s_name,method);
+            jest.dontMock(c_name);
+
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+            expect(fy).toHaveBeenCalledTimes(1);
+            expect(fy).toHaveBeenCalledWith(method.toLowerCase());
             expect(app).toBeUndefined();
             expect(app1).toBeUndefined();
         });
 
+        it('error traverse',async ()=>{
+            traverse.mockRejectedValue(error);
+            let err;
+            const route = search(root);
+            try{
+                await route(name,method);
+            }catch(e){
+                err = e;
+            }
+            expect(err).toBe(error);
+
+            try{
+                await route(s_name,method);
+            }catch(e){
+                err = e;
+            }   
+            expect(err).toBe(error);
+
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+        });
+
         it('error module',async ()=>{
-            const route = search(root);
-            
+            traverse.mockResolvedValue([f_name]);
+            jest.doMock(c_name,()=>errorFn,opts);
             let err;
+            const route = search(root);
             try{
-                await route(modules[4][0],method);
+                await route(name,method);
             }catch(e){
                 err = e;
             }
             expect(err).toBe(error);
- 
-            try{
-                await route(modules[4][0],method);
-            }catch(e){
-                err = e;
-            }
-            
-            expect(err).toBe(error);
-            expect(glob).toHaveBeenCalledTimes(1);
-            expect(glob).toHaveBeenCalledWith(pattern,opts,expect.anything());
-        });
 
+            try{
+                await route(s_name,method);
+            }catch(e){
+                err = e;
+            }   
+            expect(err).toBe(error);
+            jest.dontMock(c_name);
+            
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+        });
+        
         it('error method',async ()=>{
+            const fy = jest.fn(errorFn);
+            
+            traverse.mockResolvedValue([f_name]);
+            let err;
             const route = search(root);
             
-            let err;
+            jest.doMock(c_name,()=>fy,opts);
             try{
-                await route(modules[5][0],method);
+                await route(name,method);
             }catch(e){
                 err = e;
             }
             expect(err).toBe(error);
+            jest.dontMock(c_name);
+            
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+            expect(fy).toHaveBeenCalledTimes(1);
+            expect(fy).toHaveBeenCalledWith(method.toLowerCase());
+        });
+        
+        it('success',async ()=>{
+            const fy = jest.fn(),
+                result1 = Symbol('result1'),
+                result2 = Symbol('result2');
+            traverse.mockResolvedValue([f_name,name+slash+f_name]);
+            fy.mockReturnValue(result2)
 
-            try{
-                await route(modules[5][0],method);
-            }catch(e){
-                err = e;
-            }
-
-            expect(err).toBe(error);
-            expect(glob).toHaveBeenCalledTimes(1);
-            expect(glob).toHaveBeenCalledWith(pattern,opts,expect.anything());
+            jest.doMock(c_name,()=>({method:result1}),opts);
+            jest.doMock(c_name+slash+name,()=>fy,opts);
+            const route = search(root),
+                app1 = await route(s_name,method),
+                app2 = await route(name+slash+name,method);
+            jest.dontMock(c_name);
+            jest.dontMock(c_name+slash+name);
+            
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+            expect(fy).toHaveBeenCalledTimes(1);
+            expect(fy).toHaveBeenCalledWith(method.toLowerCase());
+            expect(app1).toBe(result1);
+            expect(app2).toBe(result2);
         });
 
-        it('success',async ()=>{
-            const route = search(root);
-            
-            const app = await route(modules[0][0],method),
-                app1 = await route(modules[1][0],method),
-                app2 = await route('path/test',method),
-                app3 = await route(modules[0][0],method);
+        it('success index',async ()=>{
+            const fy = jest.fn(),
+                result1 = Symbol('result1'),
+                result2 = Symbol('result2');
+            traverse.mockResolvedValue(['index.js',name+slash+'index.js']);
+            fy.mockReturnValue(result2)
 
-            expect(glob).toHaveBeenCalledTimes(1);
-            expect(glob).toHaveBeenCalledWith(pattern,opts,expect.anything());
-            expect(app).toBe(modules[0][1].method);
-            expect(app1).toBe(modules[1][1].method);
-            expect(app2).toBe(modules[2][1].method);
-            expect(app3).toBe(modules[0][1].method);
+            jest.doMock('./index',()=>({method:result1}),opts);
+            jest.doMock(c_name+slash+'index',()=>fy,opts);
+            const route = search(root),
+                app1 = await route(slash,method),
+                app2 = await route(name,method);
+            jest.dontMock('./index');
+            jest.dontMock(c_name+slash+'index');
+            
+            expect(traverse).toHaveBeenCalledTimes(1);
+            expect(traverse).toHaveBeenCalledWith(root);
+            expect(fy).toHaveBeenCalledTimes(1);
+            expect(fy).toHaveBeenCalledWith(method.toLowerCase());
+            expect(app1).toBe(result1);
+            expect(app2).toBe(result2);
         });
     });
 

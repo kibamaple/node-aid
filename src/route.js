@@ -1,32 +1,19 @@
-const Glob = require('glob'),
-    Path = require('path'),
+const Path = require('path'),
+    JS = require('./js'),
     Is = require('./is');
-
-function promisify(cb){
-    return function (...args) {
-        const self = this;
-        return new Promise((resolve,reject)=>{
-            args.push(
-                (e,r)=>e === undefined || e===null?resolve(r):reject(e)
-            );
-            cb.apply(self,args);
-        });
-    }
-}
-
-function toURI(path){
-    return slash === sep?path:path.replace(sep,slash);
-}
 
 const {sep,relative,basename,dirname} = Path,
     {fn,object} = Is,
-    glob = promisify(Glob),
-    pattern = '**/*.js',
+    {traverse} = JS,
     root = '',
     dot = '.',
     ext = '.js',
     slash = '/',
     index = 'index';
+
+function toURI(path){
+    return slash === sep?path:path.replace(sep,slash);
+}
 
 function init(fixed,files){
     const cache = {};
@@ -55,10 +42,10 @@ function resolveMethod(method){
     return method.toLowerCase();
 }
 
-exports.search = (cwd)=>{
-
-    const fixed = toURI(relative(__dirname,cwd)),
-        mappings = glob(pattern,{cwd})
+exports.search = (root)=>{
+    
+    const fixed = toURI(relative(__dirname,root)),
+        mappings = traverse(root)
             .then(_=>init(fixed,_));
 
     return async (path,method) => {
