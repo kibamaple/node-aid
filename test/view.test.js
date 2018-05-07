@@ -1,5 +1,5 @@
 const View = require('../src/view');
-const {koa,koaModule} = View,
+const {koa,koaRoute} = View,
     error = new Error(),
     errorFn = ()=>{throw error;};
 
@@ -17,14 +17,14 @@ describe('context',()=>{
         expect(res).toBe(respond);
     });
 
-    describe('koa module',()=>{
+    describe('koa route',()=>{
 
         it('not found',async ()=>{
             const method = Symbol('method'),
                 view = Symbol('view'),
                 opts = [Symbol('opt'),Symbol('opt1'),Symbol('opt2')],
                 route = jest.fn(),
-                mw = koaModule(route);
+                mw = koaRoute(route);
             
             const res = await mw({method},[view,...opts]);
 
@@ -38,7 +38,7 @@ describe('context',()=>{
                 view = Symbol('view'),
                 opts = [Symbol('opt'),Symbol('opt1'),Symbol('opt2')],
                 route = jest.fn(errorFn),
-                mw = koaModule(route);
+                mw = koaRoute(route);
             
             let res,err;
             try{
@@ -60,7 +60,7 @@ describe('context',()=>{
                 route = jest.fn(),
                 action = jest.fn(errorFn),
                 ctx = {method},
-                mw = koaModule(route);
+                mw = koaRoute(route);
             
             route.mockReturnValue(action);
             let res,err;
@@ -86,7 +86,7 @@ describe('context',()=>{
                 action = jest.fn(),
                 resp = Symbol('resp'),
                 ctx = {method},
-                mw = koaModule(route);
+                mw = koaRoute(route);
         
             route.mockReturnValue(action);
             action.mockReturnValue(resp);

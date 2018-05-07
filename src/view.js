@@ -11,7 +11,7 @@ exports.koa = (res)=>{
 
 }
 
-exports.koaModule = (route)=>{
+exports.koaRoute = (route)=>{
 
     return async (ctx,[view,...opts])=>{
         const {method} = ctx,

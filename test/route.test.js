@@ -4,6 +4,7 @@ const traverse = jest.fn(),
 jest.doMock('../src/js',()=>({traverse}),opts);
 const Route = require('../src/route');
 jest.dontMock('../src/js');
+jest.resetModules();
 
 const {search} = Route,
     current = '.',
