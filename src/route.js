@@ -3,13 +3,15 @@ const Path = require('path'),
     Is = require('./is');
 
 const {sep,relative,basename,dirname} = Path,
-    {fn,object} = Is,
+    {fn,object,string} = Is,
     {traverse} = JS,
     root = '',
     dot = '.',
     ext = '.js',
     slash = '/',
-    index = 'index';
+    index = 'index',
+    path_msg = 'path can\'t toString:',
+    method_msg = 'method can\'t toLowerCase:';
 
 function toURI(path){
     return slash === sep?path:path.replace(sep,slash);
@@ -35,11 +37,17 @@ function init(fixed,files){
 }
 
 function resolvePath(path){
-    return path[0] === slash?path.slice(1):path;
+    if(string(path))
+        return path[0] === slash?path.slice(1):path;
+    if(fn(path.toString))
+        return path.toString();
+    throw new Error(path_msg+path);
 }
 
 function resolveMethod(method){
-    return method.toLowerCase();
+    if(fn(method.toLowerCase))
+        return method.toLowerCase();
+    throw new Error(method_msg + method);
 }
 
 exports.search = (root)=>{
