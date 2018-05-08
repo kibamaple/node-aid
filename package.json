@@ -1,5 +1,5 @@
 {
-    "name": "aid",
+    "name": "node-aid",
     "description": "node aid library",
     "version": "0.1.0",
     "main": "src/index.js",
