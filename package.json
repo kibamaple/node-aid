@@ -1,6 +1,6 @@
 {
-    "name": "sllib",
-    "description": "simple logic library",
+    "name": "aid",
+    "description": "node aid library",
     "version": "0.1.0",
     "private": true,
     "main":"src/index.js",
