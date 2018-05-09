@@ -12,8 +12,6 @@
     "author": "kiba.x.zhao <kiba.rain@qq.com>",
     "dependencies": {
         "is": "^3.2.1",
-        "uuid": "^3.2.1",
-        "moment": "^2.22.1",
         "glob": "^7.1.2"
     },
     "devDependencies": {

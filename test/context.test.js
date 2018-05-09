@@ -10,9 +10,9 @@ describe('context',()=>{
                 param2 = Symbol('param2'),
                 param3 = Symbol('param3'),
                 query = {param1}, 
-                body = {param2},
+                fields = {param2},
                 state = {param3},
-                ctx = {state,request:{body},query},
+                ctx = {state,request:{fields},query},
                 app = jest.fn(),
                 context = koa(app,ctx);
             
@@ -27,9 +27,9 @@ describe('context',()=>{
                 param2 = Symbol('param2'),
                 param3 = Symbol('param3'),
                 query = {param1}, 
-                body = {param2:Symbol()},
+                fields = {param2:Symbol()},
                 state = {param2,param3},
-                ctx = {state,request:{body},query}
+                ctx = {state,request:{fields},query}
                 app = jest.fn(),
                 context = koa(app,ctx);
             
@@ -44,16 +44,16 @@ describe('context',()=>{
                 param2 = Symbol('param2'),
                 param3 = Symbol('param3'),
                 query = {param1}, 
-                body = {param2:Symbol()},
+                fields = {param2:Symbol()},
                 state = {param2,param3},
-                ctx = {state,request:{body},query}
-                $params = {body:['param2'],query:['param1'],state:['param2']},
+                ctx = {state,request:{fields},query}
+                $params = {fields:['param2'],query:['param1'],state:['param2']},
                 app = jest.fn();
                 
             app.$params = $params;
             const context = koa(app,ctx);
             
-            expect(context).toEqual({param1,param2:body.param2});
+            expect(context).toEqual({param1,param2:fields.param2});
             expect(app).toHaveBeenCalledTimes(0);
         });
 

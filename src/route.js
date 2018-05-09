@@ -42,15 +42,13 @@ function init(fixed,files){
 function resolvePath(path){
     if(string(path))
         return path[0] === slash?path.slice(1):path;
-    if(fn(path.toString))
+    if(path && fn(path.toString))
         return path.toString();
-    throw new Error(path_msg+path);
 }
 
 function resolveMethod(method){
     if(fn(method.toLowerCase))
         return method.toLowerCase();
-    throw new Error(method_msg + method);
 }
 
 exports.search = (cwd)=>{

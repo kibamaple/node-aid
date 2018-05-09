@@ -1,5 +1,5 @@
 const Is = require('./is');
-const {undef,object} = Is,
+const {undef,object,fn} = Is,
     {entries} = Object;
 
 function $mapping(params,ctx){
@@ -22,6 +22,7 @@ function $get (key,target,...args) {
         for(arg of args)
             if(
                 object(arg)
+                && fn(arg.hasOwnProperty)
                 && arg.hasOwnProperty(key)
             ){
                 value = arg[key];
@@ -34,13 +35,13 @@ function $get (key,target,...args) {
 }
 
 exports.koa = (app,ctx)=>{
-    const {query,request:{body},state} = ctx,
+    const {query,request:{fields,files},state} = ctx,
         {$params} = app;
     return undef($params)?new Proxy(
         {},
-        {get:(target,key)=>$get(key,target,state,body,query)}
+        {get:(target,key)=>$get(key,target,state,fields,files,query)}
     ):$mapping(
         $params,
-        {query,body,state}
+        {query,fields,files,state}
     );
 }
