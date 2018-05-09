@@ -1,7 +1,7 @@
 {
     "name": "node-aid",
     "description": "node aid library",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "main": "src/index.js",
     "scripts": {
         "dev": "./node_modules/jest/bin/jest.js --watch",
@@ -20,6 +20,6 @@
         "jest": "^22.4.3"
     },
     "engines": {
-        "node": "^6.10.1 || ^7.10.1 || >= 8.1.4"
+        "node": ">= 8.1.4"
     }
 }

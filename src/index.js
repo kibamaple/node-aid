@@ -1,8 +1,6 @@
 const Context = require('./context'),
     Handle = require('./handle'),
     Is = require('./is'),
-    JS = require('./js'),
-    Promisify = require('./promise'),
     Route = require('./route'),
     Table = require('./table'),
     View = require('./view');
@@ -19,6 +17,6 @@ function koa (ctrl,...views) {
 }
 
 module.exports={
-    Context,Handle,Is,JS,Promisify,Route,Table,View,
+    Context,Handle,Is,Route,Table,View,
     koa
 }

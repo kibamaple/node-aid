@@ -1,10 +1,13 @@
 const Path = require('path'),
-    JS = require('./js'),
+    Util = require('util'),
+    Glob = require('glob'),
     Is = require('./is');
 
 const {sep,relative,basename,dirname} = Path,
     {fn,object,string} = Is,
-    {traverse} = JS,
+    {promisify} = Util,
+    glob = promisify(Glob),
+    pattern = '**/*.js',
     root = '',
     dot = '.',
     ext = '.js',
@@ -50,10 +53,10 @@ function resolveMethod(method){
     throw new Error(method_msg + method);
 }
 
-exports.search = (root)=>{
+exports.search = (cwd)=>{
     
-    const fixed = toURI(relative(__dirname,root)),
-        mappings = traverse(root)
+    const fixed = toURI(relative(__dirname,cwd)),
+        mappings = glob(pattern,{cwd})
             .then(_=>init(fixed,_));
 
     return async (path,method) => {

@@ -111,5 +111,3 @@ curl -H "Content-Type:application/json" -X POST --data '{"p1":123,"p2":"p2"}' ht
 * `aid.Table.match`(col) 获取指定列数据
 * `aid.Table.get`(row,col) 获取指定数据单元
 * `aid.Table.first`(col) 获取首行数据单元
-##### 其他
-* `aid.Promise.promisify`(fn) 回调函数转Promise函数
