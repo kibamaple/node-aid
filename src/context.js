@@ -1,5 +1,5 @@
 const Is = require('./is');
-const {undef,object,fn} = Is,
+const {undef,object,defined} = Is,
     {entries} = Object;
 
 function $mapping(params,ctx){
@@ -10,7 +10,7 @@ function $mapping(params,ctx){
             for(name of value)
                 if(
                     !_ctx.hasOwnProperty(name) 
-                    && obj.hasOwnProperty(name)
+                    && defined(obj[name])
                 )
                     _ctx[name] = obj[name];
     return _ctx;
@@ -22,8 +22,7 @@ function $get (key,target,...args) {
         for(arg of args)
             if(
                 object(arg)
-                && fn(arg.hasOwnProperty)
-                && arg.hasOwnProperty(key)
+                && defined(arg[key])
             ){
                 value = arg[key];
                 break;

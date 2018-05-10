@@ -7,7 +7,7 @@ async function exec (ctx,app,context,...views){
         result = await app(param);
     let view,respond;
     for(view of views)
-        if(defined(respond = await view(ctx,result)))
+        if(defined(respond = await view(ctx,result || [])))
             break;
     if(undef(respond))
         throw new Error(message+JSON.stringify(result));

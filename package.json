@@ -1,7 +1,7 @@
 {
     "name": "node-aid",
     "description": "node aid library",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "main": "src/index.js",
     "scripts": {
         "dev": "./node_modules/jest/bin/jest.js --watch",

@@ -1,10 +1,11 @@
 const Is = require('./is');
-const {fn} = Is;
+const {fn,integer} = Is;
 
 exports.koa = (res)=>{
 
     return (ctx,[status,body])=>{
-        ctx.status = status || 200;
+        if(!status || integer(status))
+            ctx.status = status || 200;
         ctx.body = body;
         return res;
     };

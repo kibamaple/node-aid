@@ -7,7 +7,7 @@ describe('context',()=>{
 
     it('koa',async ()=>{
         const ctx = {},
-            status = Symbol('status'),
+            status = 123,
             body = Symbol('body'),
             respond = Symbol('respond'),
             mw = koa(respond);
