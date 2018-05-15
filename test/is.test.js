@@ -1,4 +1,5 @@
 const Is = require('../src/is');
+jest.resetModules();
 const {
     string,
     object,

@@ -1,32 +1,23 @@
 const Is = require('./is');
-const {undef,fn,array,defined} = Is,
-    message = 'view not found:';
+const {array,fn,defined} = Is;
 
-async function exec (ctx,app,context,...views){
-    const param = await context(app,ctx),
-        result = await app(param);
-    let view,respond;
-    for(view of views)
-        if(defined(respond = await view(ctx,result || [])))
-            break;
-    if(undef(respond))
-        throw new Error(message+JSON.stringify(result));
-    return respond;
-}
+module.exports = (routes,views)=>{
 
-exports.koa = (route,context,...views)=>{
+    return async (path,ctx)=>{
 
-    return async (ctx,next) => {
-        const {path,method} = ctx,
-            app = await route(path,method);
-        if(undef(app))
-            return next();
+        let route,action;
+        for(route of routes)
+            if(fn(action = await route(path)))
+                break;
+        if(!fn(action))
+            throw path;
+        
+        const res = await action(ctx);
+        let view,respond;
+        for(view of views)
+            if(defined(respond = await view(ctx,res)))
+                break;
+        return respond;
 
-        const respond = await exec(ctx,app,context,...views);
-        if(fn(respond))
-            return await respond(next);
-        if(respond !== true)
-            return next();
-    }
-
+    };
 };

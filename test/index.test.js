@@ -1,109 +1,46 @@
-const context = Symbol('context'),
-    handle = jest.fn(),
-    route = jest.fn(),
-    view = jest.fn(),
-    opts = {virtual: true};
-
-jest.doMock('../src/context',()=>({koa:context}),opts);
-jest.doMock('../src/handle',()=>({koa:handle}),opts);
-jest.doMock('../src/route',()=>({search:route}),opts);
-jest.doMock('../src/view',()=>({koa:view}),opts);
-const Index = require('../src/index');
-jest.dontMock('../src/context');
-jest.dontMock('../src/handle');
-jest.dontMock('../src/route');
-jest.dontMock('../src/view');
-jest.resetModules();
-
-const {koa} = Index,
-    ctrl = Symbol('ctrl'),
-    views = [Symbol('view1'),Symbol('view2'),Symbol('view3')],
-    error = new Error(),
-    errorFn = ()=>{throw error;};
+const opts = {virtual: true},
+    context= Symbol('context'),
+    handle = Symbol('handle'),
+    is = Symbol('is'),
+    route = Symbol('route'),
+    table = Symbol('table'),
+    koa = Symbol('koa'),
+    view = Symbol('view');
 
 describe('index',()=>{
-    
-    describe('koa',()=>{
+
+    beforeAll(()=>{
+        jest.doMock('../src/context',()=>context,opts);
+        jest.doMock('../src/handle',()=>handle,opts);
+        jest.doMock('../src/is',()=>is,opts);
+        jest.doMock('../src/route',()=>route,opts);
+        jest.doMock('../src/table',()=>table,opts);
+        jest.doMock('../src/koa',()=>koa,opts);
+        jest.doMock('../src/view',()=>view,opts);
+    })
+
+    afterAll(()=>{
+        jest.dontMock('../src/context');
+        jest.dontMock('../src/handle');
+        jest.dontMock('../src/is');
+        jest.dontMock('../src/route');
+        jest.dontMock('../src/table');
+        jest.dontMock('../src/koa');
+        jest.dontMock('../src/view');
+        jest.resetModules();
+    });
+
+    it('exports',()=>{
+        const module = require('../src/index'),
+            {Context,Handle,Is,Route,Table,View,Koa} = module;
         
-        afterEach(()=>{
-            handle.mockReset();
-            route.mockReset();
-            view.mockReset();
-        });
-
-        it('route error',()=>{
-            route.mockImplementation(errorFn);
-            let err;
-            try{
-                koa(ctrl,...views);
-            }catch(e){
-                err = e;
-            }
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(ctrl);
-            expect(handle).toHaveBeenCalledTimes(0);
-            expect(view).toHaveBeenCalledTimes(0);
-        });
-
-        it('default view error',()=>{
-            const r = Symbol('r');
-
-            route.mockReturnValue(r);
-            view.mockImplementation(errorFn);
-            let err;
-            try{
-                koa(ctrl,...views);
-            }catch(e){
-                err = e;
-            }
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(ctrl);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(true);
-            expect(handle).toHaveBeenCalledTimes(0);
-        });
-
-        it('handle error',()=>{
-            const r = Symbol('r'),
-                v = Symbol('v');
-
-            route.mockReturnValue(r);
-            view.mockReturnValue(v);
-            handle.mockImplementation(errorFn);
-            let err;
-            try{
-                koa(ctrl,...views);
-            }catch(e){
-                err = e;
-            }
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(ctrl);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(true);
-            expect(handle).toHaveBeenCalledTimes(1);
-            expect(handle).toHaveBeenCalledWith(r,context,...views,v);
-        });
-        
-        it('success',()=>{
-            const r = Symbol('r'),
-                v = Symbol('v'),
-                res = Symbol('res');
-
-            route.mockReturnValue(r);
-            view.mockReturnValue(v);
-            handle.mockReturnValue(res);
-            const respd = koa(ctrl,...views);
-            expect(respd).toBe(res);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(ctrl);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(true);
-            expect(handle).toHaveBeenCalledTimes(1);
-            expect(handle).toHaveBeenCalledWith(r,context,...views,v);
-        });
+        expect(Context).toBe(context);
+        expect(Handle).toBe(handle);
+        expect(Is).toBe(is);
+        expect(Route).toBe(route);
+        expect(Table).toBe(table);
+        expect(View).toBe(view);
+        expect(Koa).toBe(koa);
     });
 
 });

@@ -4,7 +4,7 @@ const Path = require('path'),
     Is = require('./is');
 
 const {sep,relative,basename,dirname} = Path,
-    {fn,object,string} = Is,
+    {fn,object,string,defined} = Is,
     {promisify} = Util,
     glob = promisify(Glob),
     pattern = '**/*.js',
@@ -42,23 +42,24 @@ function init(fixed,files){
 function resolvePath(path){
     if(string(path))
         return path[0] === slash?path.slice(1):path;
-    if(path && fn(path.toString))
+    if(defined(path) && path!=null && fn(path.toString))
         return path.toString();
 }
 
 function resolveMethod(method){
-    if(fn(method.toLowerCase))
+    if(defined(method) && method!=null && fn(method.toLowerCase))
         return method.toLowerCase();
 }
 
-exports.search = (cwd)=>{
+module.exports = (cwd)=>{
     
     const fixed = toURI(relative(__dirname,cwd)),
         mappings = glob(pattern,{cwd})
             .then(_=>init(fixed,_));
 
-    return async (path,method) => {
-        const cache = await mappings;
+    return async (ctx) => {
+        const {path,method} = ctx || {},
+            cache = await mappings;
         let uri,module,action;
         if(uri = cache[resolvePath(path)]){
             module = require(uri);

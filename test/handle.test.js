@@ -1,275 +1,209 @@
 const Handle = require('../src/handle');
-const {koa} = Handle,
-    path = Symbol('path'),
-    method = Symbol('method'),
-    ctx = {path,method},
+
+const path = Symbol('path'),
+    ctx = Symbol('ctx'),
+    res = Symbol('res'),
+    respond = Symbol('respond'),
     error = new Error(),
     errorFn = ()=>{throw error;};
 
 describe('handle',()=>{
-    
-    describe('koa',()=>{
-        
-        it('route undefined',async ()=>{
-            const route = jest.fn(),
-                context = jest.fn(),
-                view = jest.fn(),
-                next = jest.fn(),
-                mw = koa(route,context,view);
-                
-            route.mockReturnValue(undefined);
-            await mw(ctx,next);
-            
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(0);
-            expect(view).toHaveBeenCalledTimes(0);
-        });
 
-        it('route error',async ()=>{
-            const route = jest.fn(errorFn),
-                context = jest.fn(),
-                view = jest.fn(),
-                next = jest.fn(),
-                mw = koa(route,context,view);
-            
-            let err;
-            try{
-                await mw(ctx,next);
-            }catch(e){
-                err = e;
-            }
-            
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(0);
-            expect(view).toHaveBeenCalledTimes(0);
-        });
+    it('route error',async ()=>{
+        const route = jest.fn(errorFn),
+            view = jest.fn(),
+            f_route = jest.fn(),
+            f_view = jest.fn(),
+            l_route = jest.fn(),
+            l_view = jest.fn(),
+            handle = Handle(
+                [f_route,route,l_route],
+                [f_view,view,l_view]
+            );
 
-        it('context error',async ()=>{
-            const route = jest.fn(),
-                context = jest.fn(errorFn),
-                view = jest.fn(),
-                app = jest.fn(),
-                next = jest.fn(),
-                mw = koa(route,context,view);
-                
-            route.mockReturnValue(app);
-            let err;
-            try{
-                await mw(ctx,next);
-            }catch(e){
-                err = e;
-            }
-                
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(0);
-            expect(view).toHaveBeenCalledTimes(0);
-            expect(next).toHaveBeenCalledTimes(0);
-        });
+        let err;
+        try{
+            await handle(path,ctx);
+        }catch(e){
+            err = e;
+        }
 
-        it('app error',async ()=>{
-            const route = jest.fn(), 
-                context = jest.fn(),
-                view = jest.fn(),
-                app = jest.fn(errorFn),
-                next = jest.fn(),
-                param = Symbol('param'),
-                mw = koa(route,context,view);
-                
-            
-            route.mockReturnValue(app);
-            context.mockReturnValue(param);
-            let err;
-            try{
-                await mw(ctx,next);
-            }catch(e){
-                err = e;
-            }
-                
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(1);
-            expect(app).toHaveBeenCalledWith(param);
-            expect(view).toHaveBeenCalledTimes(0);
-            expect(next).toHaveBeenCalledTimes(0);
-        });
-
-        it('view error',async ()=>{
-            const route = jest.fn(), 
-                context = jest.fn(),
-                view = jest.fn(errorFn),
-                app = jest.fn(),
-                next = jest.fn(),
-                param = Symbol('param'),
-                result = Symbol('result'),
-                mw = koa(route,context,view);
-
-            route.mockReturnValue(app);
-            context.mockReturnValue(param);
-            app.mockReturnValue(result);
-            let err;
-            try{
-                await mw(ctx,next);
-            }catch(e){
-                err = e;
-            }
-                
-            expect(err).toBe(error);
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(1);
-            expect(app).toHaveBeenCalledWith(param);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(ctx,result);
-            expect(next).toHaveBeenCalledTimes(0);
-        });
-
-        it('view not found',async ()=>{
-            const route = jest.fn(),
-                context = jest.fn(),
-                view = jest.fn(),
-                view1 = jest.fn(),
-                view2 = jest.fn(),
-                app = jest.fn(),
-                param = Symbol('param'),
-                result = Symbol('result'),
-                next = jest.fn(),
-                mw = koa(route,context,view,view1,view2);
-            
-            route.mockReturnValue(app);
-            context.mockReturnValue(param);
-            app.mockReturnValue(result);
-            let err;
-            try{
-                await mw(ctx,next);
-            }catch(e){
-                err = e;
-            }
-
-            expect(err).toBeDefined();
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(1);
-            expect(app).toHaveBeenCalledWith(param);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(ctx,result);
-            expect(view1).toHaveBeenCalledTimes(1);
-            expect(view1).toHaveBeenCalledWith(ctx,result);
-            expect(view2).toHaveBeenCalledTimes(1);
-            expect(next).toHaveBeenCalledTimes(0);
-        });
-
-        it('success',async ()=>{
-            const route = jest.fn(),
-                context = jest.fn(),
-                view = jest.fn(),
-                view1 = jest.fn(),
-                view2 = jest.fn(),
-                app = jest.fn(),
-                param = Symbol('param'),
-                result = Symbol('result'),
-                next = jest.fn(),
-                mw = koa(route,context,view,view1,view2);
-            
-            route.mockReturnValue(app);
-            context.mockReturnValue(param);
-            app.mockReturnValue(result);
-            view1.mockReturnValue(true);
-            await mw(ctx,next);
-            
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(1);
-            expect(app).toHaveBeenCalledWith(param);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(ctx,result);
-            expect(view1).toHaveBeenCalledTimes(1);
-            expect(view1).toHaveBeenCalledWith(ctx,result);
-            expect(view2).toHaveBeenCalledTimes(0);
-            expect(next).toHaveBeenCalledTimes(0);
-        });
-
-        it('success with next',async ()=>{
-            const route = jest.fn(),
-                context = jest.fn(),
-                view = jest.fn(),
-                view1 = jest.fn(),
-                view2 = jest.fn(),
-                app = jest.fn(),
-                param = Symbol('param'),
-                result = Symbol('result'),
-                next = jest.fn(),
-                mw = koa(route,context,view,view1,view2);
-            
-            route.mockReturnValue(app);
-            context.mockReturnValue(param);
-            app.mockReturnValue(result);
-            view1.mockReturnValue(false);
-            await mw(ctx,next);
-            
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(1);
-            expect(app).toHaveBeenCalledWith(param);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(ctx,result);
-            expect(view1).toHaveBeenCalledTimes(1);
-            expect(view1).toHaveBeenCalledWith(ctx,result);
-            expect(view2).toHaveBeenCalledTimes(0);
-            expect(next).toHaveBeenCalledTimes(1);
-        });
-
-        it('success with function',async ()=>{
-            const route = jest.fn(),
-                context = jest.fn(),
-                view = jest.fn(),
-                view1 = jest.fn(),
-                view2 = jest.fn(),
-                rsp = jest.fn(),
-                app = jest.fn(),
-                param = Symbol('param'),
-                result = Symbol('result'),
-                next = jest.fn(),
-                mw = koa(route,context,view,view1,view2);
-            
-            route.mockReturnValue(app);
-            context.mockReturnValue(param);
-            app.mockReturnValue(result);
-            view1.mockReturnValue(rsp);
-            await mw(ctx,next);
-            
-            expect(route).toHaveBeenCalledTimes(1);
-            expect(route).toHaveBeenCalledWith(path,method);
-            expect(context).toHaveBeenCalledTimes(1);
-            expect(context).toHaveBeenCalledWith(app,ctx);
-            expect(app).toHaveBeenCalledTimes(1);
-            expect(app).toHaveBeenCalledWith(param);
-            expect(view).toHaveBeenCalledTimes(1);
-            expect(view).toHaveBeenCalledWith(ctx,result);
-            expect(view1).toHaveBeenCalledTimes(1);
-            expect(view1).toHaveBeenCalledWith(ctx,result);
-            expect(view2).toHaveBeenCalledTimes(0);
-            expect(rsp).toHaveBeenCalledTimes(1);
-            expect(rsp).toHaveBeenCalledWith(next);
-        });
-
+        expect(err).toBe(error);
+        expect(f_route).toHaveBeenCalledTimes(1);
+        expect(f_route).toHaveBeenCalledWith(path);
+        expect(route).toHaveBeenCalledTimes(1);
+        expect(route).toHaveBeenCalledWith(path);
+        expect(l_route).not.toHaveBeenCalled();
+        expect(f_view).not.toHaveBeenCalled();
+        expect(view).not.toHaveBeenCalled();
+        expect(l_view).not.toHaveBeenCalled();        
     });
 
+    it('non route match',async ()=>{
+        const route = jest.fn(),
+            view = jest.fn(),
+            f_route = jest.fn(),
+            f_view = jest.fn(),
+            l_route = jest.fn(),
+            l_view = jest.fn(),
+            handle = Handle(
+                [f_route,route,l_route],
+                [f_view,view,l_view]
+            );
+
+        let err;
+        try{
+            await handle(path,ctx);
+        }catch(e){
+            err = e;
+        }
+
+        expect(err).toBe(path);
+        expect(f_route).toHaveBeenCalledTimes(1);
+        expect(f_route).toHaveBeenCalledWith(path);
+        expect(route).toHaveBeenCalledTimes(1);
+        expect(route).toHaveBeenCalledWith(path);
+        expect(l_route).toHaveBeenCalledTimes(1);
+        expect(l_route).toHaveBeenCalledWith(path);
+        expect(f_view).not.toHaveBeenCalled();
+        expect(view).not.toHaveBeenCalled();
+        expect(l_view).not.toHaveBeenCalled();
+    });
+
+    it('action error',async ()=>{
+        const route = jest.fn(),
+            view = jest.fn(),
+            f_route = jest.fn(),
+            f_view = jest.fn(),
+            l_route = jest.fn(),
+            l_view = jest.fn(),
+            action = jest.fn(errorFn),
+            handle = Handle(
+                [f_route,route,l_route],
+                [f_view,view,l_view]
+            );
+        
+        route.mockReturnValue(action);
+        let err;
+        try{
+            await handle(path,ctx);
+        }catch(e){
+            err = e;
+        }
+
+        expect(err).toBe(error);
+        expect(f_route).toHaveBeenCalledTimes(1);
+        expect(f_route).toHaveBeenCalledWith(path);
+        expect(route).toHaveBeenCalledTimes(1);
+        expect(route).toHaveBeenCalledWith(path);
+        expect(l_route).not.toHaveBeenCalled();
+        expect(action).toHaveBeenCalledTimes(1);
+        expect(action).toHaveBeenCalledWith(ctx);
+        expect(f_view).not.toHaveBeenCalled();
+        expect(view).not.toHaveBeenCalled();
+        expect(l_view).not.toHaveBeenCalled();
+    });
+
+    it('view error',async ()=>{
+        const route = jest.fn(),
+            view = jest.fn(errorFn),
+            f_route = jest.fn(),
+            f_view = jest.fn(),
+            l_route = jest.fn(),
+            l_view = jest.fn(),
+            action = jest.fn(),
+            handle = Handle(
+                [f_route,route,l_route],
+                [f_view,view,l_view]
+            );
+        
+        route.mockReturnValue(action);
+        action.mockReturnValue(res);
+        let err;
+        try{
+            await handle(path,ctx);
+        }catch(e){
+            err = e;
+        }
+
+        expect(err).toBe(error);
+        expect(f_route).toHaveBeenCalledTimes(1);
+        expect(f_route).toHaveBeenCalledWith(path);
+        expect(route).toHaveBeenCalledTimes(1);
+        expect(route).toHaveBeenCalledWith(path);
+        expect(l_route).not.toHaveBeenCalled();
+        expect(action).toHaveBeenCalledTimes(1);
+        expect(action).toHaveBeenCalledWith(ctx);
+        expect(f_view).toHaveBeenCalledTimes(1);
+        expect(f_view).toHaveBeenCalledWith(ctx,res);
+        expect(view).toHaveBeenCalledTimes(1);
+        expect(view).toHaveBeenCalledWith(ctx,res);
+        expect(l_view).not.toHaveBeenCalled();
+    });
+
+    it('non view match',async ()=>{
+        const route = jest.fn(),
+            view = jest.fn(),
+            f_route = jest.fn(),
+            f_view = jest.fn(),
+            l_route = jest.fn(),
+            l_view = jest.fn(),
+            action = jest.fn(),
+            handle = Handle(
+                [f_route,route,l_route],
+                [f_view,view,l_view]
+            );
+        
+        route.mockReturnValue(action);
+        action.mockReturnValue(res);
+        const rsd = await handle(path,ctx);
+
+        expect(f_route).toHaveBeenCalledTimes(1);
+        expect(f_route).toHaveBeenCalledWith(path);
+        expect(route).toHaveBeenCalledTimes(1);
+        expect(route).toHaveBeenCalledWith(path);
+        expect(l_route).not.toHaveBeenCalled();
+        expect(action).toHaveBeenCalledTimes(1);
+        expect(action).toHaveBeenCalledWith(ctx);
+        expect(f_view).toHaveBeenCalledTimes(1);
+        expect(f_view).toHaveBeenCalledWith(ctx,res);
+        expect(view).toHaveBeenCalledTimes(1);
+        expect(view).toHaveBeenCalledWith(ctx,res);
+        expect(l_view).toHaveBeenCalledTimes(1);
+        expect(l_view).toHaveBeenCalledWith(ctx,res);
+        expect(rsd).toBeUndefined();
+    });
+
+    it('complete',async ()=>{
+        const route = jest.fn(),
+            view = jest.fn(),
+            f_route = jest.fn(),
+            f_view = jest.fn(),
+            l_route = jest.fn(),
+            l_view = jest.fn(),
+            action = jest.fn(),
+            handle = Handle(
+                [f_route,route,l_route],
+                [f_view,view,l_view]
+            );
+        
+        route.mockReturnValue(action);
+        action.mockReturnValue(res);
+        view.mockReturnValue(respond);
+        const rsd = await handle(path,ctx);
+
+        expect(f_route).toHaveBeenCalledTimes(1);
+        expect(f_route).toHaveBeenCalledWith(path);
+        expect(route).toHaveBeenCalledTimes(1);
+        expect(route).toHaveBeenCalledWith(path);
+        expect(l_route).not.toHaveBeenCalled();
+        expect(action).toHaveBeenCalledTimes(1);
+        expect(action).toHaveBeenCalledWith(ctx);
+        expect(f_view).toHaveBeenCalledTimes(1);
+        expect(f_view).toHaveBeenCalledWith(ctx,res);
+        expect(view).toHaveBeenCalledTimes(1);
+        expect(view).toHaveBeenCalledWith(ctx,res);
+        expect(l_view).not.toHaveBeenCalled();
+        expect(rsd).toBe(respond);
+    });
 });

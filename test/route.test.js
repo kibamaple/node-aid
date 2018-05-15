@@ -6,8 +6,7 @@ const Route = require('../src/route');
 jest.dontMock('glob');
 jest.resetModules();
 
-const {search} = Route,
-    parent = '**/*.js',
+const parent = '**/*.js',
     current = '.',
     cwd = __dirname,
     method = 'METHOD',
@@ -21,7 +20,7 @@ const {search} = Route,
 
 describe('route',()=>{
     
-    describe('search',()=>{
+    describe('Route',()=>{
 
         afterEach(()=>{
             glob.mockReset();
@@ -32,9 +31,9 @@ describe('route',()=>{
             glob.mockImplementation(
                 (p,o,cb)=>cb(undefined,[])
             );
-            const route = search(cwd),
-                app = await route(name,method),
-                app1 = await route(s_name,method);
+            const route = Route(cwd),
+                app = await route({path:name,method}),
+                app1 = await route({path:name,s_name,method});
 
             expect(glob).toHaveBeenCalledTimes(1);
             expect(glob).toHaveBeenCalledWith(parent,{cwd},expect.anything());
@@ -46,9 +45,9 @@ describe('route',()=>{
             glob.mockImplementation(
                 (p,o,cb)=>cb(undefined,['index.js'])
             );
-            const route = search(cwd),
-                app = await route(name,method),
-                app1 = await route(s_name,method);
+            const route = Route(cwd),
+                app = await route({path:name,method}),
+                app1 = await route({path:s_name,method});
 
             expect(glob).toHaveBeenCalledTimes(1);
             expect(glob).toHaveBeenCalledWith(parent,{cwd},expect.anything());
@@ -62,15 +61,15 @@ describe('route',()=>{
             glob.mockImplementation(
                 (p,o,cb)=>cb(undefined,[f_name])
             );
-            const route = search(cwd);
+            const route = Route(cwd);
             
             jest.doMock(c_name,()=>({}),opts);
-            const app = await route(name,method);
+            const app = await route({path:name,method});
             jest.dontMock(c_name);
             jest.resetModules();
 
             jest.doMock(c_name,()=>fy,opts);
-            const app1 = await route(s_name,method);
+            const app1 = await route({path:s_name,method});
             jest.dontMock(c_name);
 
             expect(glob).toHaveBeenCalledTimes(1);
@@ -86,16 +85,16 @@ describe('route',()=>{
                 (p,o,cb)=>cb(error)
             );
             let err;
-            const route = search(cwd);
+            const route = Route(cwd);
             try{
-                await route(name,method);
+                await route({path:name,method});
             }catch(e){
                 err = e;
             }
             expect(err).toBe(error);
 
             try{
-                await route(s_name,method);
+                await route({path:s_name,method});
             }catch(e){
                 err = e;
             }   
@@ -111,16 +110,16 @@ describe('route',()=>{
             );
             jest.doMock(c_name,()=>errorFn,opts);
             let err;
-            const route = search(cwd);
+            const route = Route(cwd);
             try{
-                await route(name,method);
+                await route({path:name,method});
             }catch(e){
                 err = e;
             }
             expect(err).toBe(error);
 
             try{
-                await route(s_name,method);
+                await route({path:s_name,method});
             }catch(e){
                 err = e;
             }   
@@ -138,11 +137,11 @@ describe('route',()=>{
                 (p,o,cb)=>cb(undefined,[f_name])
             );
             let err;
-            const route = search(cwd);
+            const route = Route(cwd);
             
             jest.doMock(c_name,()=>fy,opts);
             try{
-                await route(name,method);
+                await route({path:name,method});
             }catch(e){
                 err = e;
             }
@@ -170,9 +169,9 @@ describe('route',()=>{
 
             jest.doMock(c_name,()=>({method:result1}),opts);
             jest.doMock(c_name+slash+name,()=>fy,opts);
-            const route = search(cwd),
-                app1 = await route(s_name,method),
-                app2 = await route(name+slash+name,method);
+            const route = Route(cwd),
+                app1 = await route({path:s_name,method}),
+                app2 = await route({path:name+slash+name,method});
             jest.dontMock(c_name);
             jest.dontMock(c_name+slash+name);
             
@@ -199,9 +198,9 @@ describe('route',()=>{
 
             jest.doMock('./index',()=>({method:result1}),opts);
             jest.doMock(c_name+slash+'index',()=>fy,opts);
-            const route = search(cwd),
-                app1 = await route(slash,method),
-                app2 = await route(name,method);
+            const route = Route(cwd),
+                app1 = await route({path:slash,method}),
+                app2 = await route({path:name,method});
             jest.dontMock('./index');
             jest.dontMock(c_name+slash+'index');
             

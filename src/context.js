@@ -1,24 +1,31 @@
 const Is = require('./is');
-const {undef,object,defined} = Is,
-    {entries} = Object;
+const {undef,object,defined} = Is;
 
-function $mapping(params,ctx){
-    let _ctx = {},
-        key,value,name,obj;
-    for([key, value] of entries(params))
-        if(object(obj = ctx[key]))    
-            for(name of value)
-                if(
-                    !_ctx.hasOwnProperty(name) 
-                    && defined(obj[name])
-                )
-                    _ctx[name] = obj[name];
-    return _ctx;
+function $mapGet (key,target,mapping,...args){
+
+    if(target.hasOwnProperty(key))
+        return target[key];
+
+    let ns;
+    if(undef(ns = mapping[key]))
+        return $queueGet(key,target,...args);
+    
+    let n,arg,value;
+    for(n of ns){
+        for(arg of args)
+            if(defined(value = arg[n]))
+                break;
+        if(defined(value))
+            break;
+    }
+
+    return target[key] = value;
 }
 
-function $get (key,target,...args) {
-    let value,arg;
+function $queueGet (key,target,...args) {
+
     if(!target.hasOwnProperty(key)){
+        let value,arg;
         for(arg of args)
             if(
                 object(arg)
@@ -33,14 +40,9 @@ function $get (key,target,...args) {
     return target[key];
 }
 
-exports.koa = (app,ctx)=>{
-    const {query,request:{fields,files},state} = ctx,
-        {$params} = app;
-    return undef($params)?new Proxy(
-        {},
-        {get:(target,key)=>$get(key,target,state,fields,files,query)}
-    ):$mapping(
-        $params,
-        {query,fields,files,state}
-    );
+module.exports = (mapping,...args)=>{
+    let get = defined(mapping)
+        ?(target,key)=>$mapGet(key,target,mapping,...args)
+        :(target,key)=>$queueGet(key,target,...args);
+    return new Proxy({},{get});
 }

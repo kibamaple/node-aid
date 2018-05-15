@@ -1,24 +1,29 @@
 const Is = require('./is');
-const {fn,integer} = Is;
+const {array,fn,defined} = Is;
 
-exports.koa = (res)=>{
-
-    return (ctx,[status,body])=>{
-        if(!status || integer(status))
-            ctx.status = status || 200;
-        ctx.body = body;
-        return res;
-    };
-
+function base(ctx,res){
+    return res;
 }
 
-exports.koaRoute = (route)=>{
+module.exports = (route)=>{
+    if(fn(route))
+        return async (ctx,res)=>{
 
-    return async (ctx,[view,...opts])=>{
-        const {method} = ctx,
-            action = await route(view,method);
-        if(fn(action))
-            return await action(ctx,...opts);
-    };
+            let r_ctx,args;
+            if(array(res)){
+                r_ctx = res[0];
+                args = res.slice(1);
+            }else{
+                r_ctx = res;
+            }
 
+            const action = await route(r_ctx);
+            if(fn(action))
+                return await action(ctx,...args);
+        };
+    
+    if(defined(route))
+        return ()=>route;
+
+    return base;
 }
