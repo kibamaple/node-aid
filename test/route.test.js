@@ -33,12 +33,14 @@ describe('route',()=>{
             );
             const route = Route(cwd),
                 app = await route({path:name,method}),
-                app1 = await route({path:name,s_name,method});
+                app1 = await route({path:name,s_name,method}),
+                app2 = await route();
 
             expect(glob).toHaveBeenCalledTimes(1);
             expect(glob).toHaveBeenCalledWith(parent,{cwd},expect.anything());
             expect(app).toBeUndefined();
             expect(app1).toBeUndefined();
+            expect(app2).toBeUndefined();
         });
 
         it('not found module',async ()=>{
@@ -170,11 +172,11 @@ describe('route',()=>{
             jest.doMock(c_name,()=>({method:result1}),opts);
             jest.doMock(c_name+slash+name,()=>fy,opts);
             const route = Route(cwd),
-                app1 = await route({path:s_name,method}),
-                app2 = await route({path:name+slash+name,method});
+                app1 = await route([s_name,method]),
+                app2 = await route([name+slash+name,method]);
             jest.dontMock(c_name);
             jest.dontMock(c_name+slash+name);
-            
+
             expect(glob).toHaveBeenCalledTimes(1);
             expect(glob).toHaveBeenCalledWith(parent,{cwd},expect.anything());
             expect(fy).toHaveBeenCalledTimes(1);
@@ -211,6 +213,35 @@ describe('route',()=>{
             expect(app1).toBe(result1);
             expect(app2).toBe(result2);
         });
+
+        it('only path',async ()=>{
+            const fy = jest.fn(),
+                result1 = Symbol('result1'),
+                result2 = Symbol('result2');
+            
+            glob.mockImplementation(
+                (p,o,cb)=>cb(
+                    undefined,
+                    [f_name,name+slash+f_name]
+                )
+            );
+            fy.mockReturnValue(result2)
+
+            jest.doMock(c_name,()=>({method:result1}),opts);
+            jest.doMock(c_name+slash+name,()=>fy,opts);
+            const route = Route(cwd),
+                app1 = await route(s_name),
+                app2 = await route(name+slash+name);
+            jest.dontMock(c_name);
+            jest.dontMock(c_name+slash+name);
+            
+            expect(glob).toHaveBeenCalledTimes(1);
+            expect(glob).toHaveBeenCalledWith(parent,{cwd},expect.anything());
+            expect(fy).not.toHaveBeenCalled();
+            expect(app1).toBeUndefined();
+            expect(app2).toBe(fy);
+        });
+
     });
 
 });

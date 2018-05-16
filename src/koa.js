@@ -4,10 +4,10 @@ const Context = require('./context'),
     Route = require('./route'),
     View = require('./view');
 
-const {fn,defined,array,object,undef} = Is;
+const {defined,array,object,undef,integer} = Is;
 
-function httpRespond (ctx,status,body,headers,cookies) {
-    if (!undef(status))
+function respond (ctx,status,body,headers,cookies) {
+    if (integer(status))
         ctx.status = status;
 
     if (object(headers))
@@ -21,39 +21,36 @@ function httpRespond (ctx,status,body,headers,cookies) {
         ctx.body = body;
 }
 
+function viewFn (_) {
+    return View(undef(_)?_:Route(_));
+}
+
 module.exports = (routes,views) => {
 
     const rs = routes.map(Route),
-        vs = views.map(Route).map(View),
+        vs = views.map(viewFn),
         handle = Handle(rs,vs);
 
     return async (ctx,next)=>{
-        
-        let route,action
-        for(route of rs)
-            if(fn(action = await route(ctx)))
-                break;
 
-        if(fn(action)){
-            const {query,request:{fields,files},state} = ctx,
-                {$mapping} = action,
-                context = Context($mapping,state,files,fields,query);
-            let res;
-            try{
-                res = await handle(ctx,context);
-            }catch(e){
-                if(e !== ctx)
-                    throw e;
-            }
-            
-            if(res === null)
-                return httpRespond(ctx);
-            if(array(res))
-                return httpRespond(ctx,...res);
-            if(defined(res)){
-                const {status,body,headers,cookies} = res;
-                return httpRespond(ctx,status,body,headers,cookies);
-            }
+        const {query,request:{fields,files},state} = ctx,
+            context = Context(undefined,state,files,fields,query);
+        
+        let res;
+        try{
+            res = await handle(ctx,context);
+        }catch(e){
+            if(e !== ctx)
+                throw e;
+        }
+        
+        if(res === null)
+            return respond(ctx);
+        if(array(res))
+            return respond(ctx,...res);
+        if(defined(res)){
+            const {status,body,headers,cookies} = res;
+            return respond(ctx,status,body,headers,cookies);
         }
 
         return next();

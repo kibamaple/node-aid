@@ -12,18 +12,15 @@ const Koa = require('koa'),
     Path = require('path'),
     Aid = require('node-aid'),
     {join} = Path,
-    {koa,View,Route} = Aid,
-    {koa:route} = Route,
-    {koaRoute:view} = View;
+    {Koa:aid} = Aid;
 
 const PORT = process.env.PORT || 80,
     app = new Koa(),
     ctrlPath = join(__dirname,'ctrl'),//业务代码目录
     viewPath = join(__dirname,'view');//视图代码目录
-    viewRoute = route(viewPath);//视图路由
 
 // 挂载组件
-app.use(koa(ctrl,view(route))); 
+app.use(aid([ctrlPath],[viewPath,undefined]));
 // 如下,只简单respond，不使用视图处理
 // app.use(koa(ctrl));
 
@@ -54,7 +51,7 @@ exports.post = async ({p1,p2})=>{
     // body 由xxx视图设置
     const contain = await Model1.contain(p1);
     if(!contain)
-        return ['xview',{contain},{p1,p2}]
+        return [['xview','post'],{contain},{p1,p2}]
     
     const table = await Model2.query(p2);
     // 正常响应
@@ -80,16 +77,20 @@ curl -H "Content-Type:application/json" -X POST --data '{"p1":123,"p2":"p2"}' ht
 ### API
 ***
 ##### Handle执行流程
-* `aid.koa`(ctrl,...views) 基于koa构建执行流程
-* `aid.Handle.koa`(route,context,...views) 构建执行流程
-* `aid.Route.search`(dirname) 目录下功能模块路由
-* `aid.Context.koa`模块功能参数构建
-* `aid.view.koa`(complete) 简易视图，响应返回json
-  * `complete = true` 完成响应，中止后续执行。
-* `aid.view.koaRoute`(route)视图路由，指定特定视图处理模块响应。
+* `aid.Koa`(routes,views) 基于koa构建执行流程
+  * routes,views均为目录路径，views中undefind则创建默认处理视图
+  * view返回数组顺序为：status,body,headers,cookies
+  * view返回对象为：{status,body,headers,cookies}
+* `aid.Handle`(routes,views) 构建执行流程
+  * routes为功能路由模块数组
+  * views为视图处理模块数组
+* `aid.Route`(dirname) 目录下模块路由
+* `aid.Context` (mapping,...args) 参数构建
+  * mapping为参数映射，如将`param1`映射为`param2`或`param3`为`{param1:["param2","param3"]}`
+  * args为取值的对象
+* `aid.View`(route) 视图处理,route为undefined即默认处理（返回功能执行结果）
+  * route为功能路由模块
 ##### Is变量类型判断
-* `aid.Is.string`
-* `aid.Is.object`
 * `aid.Is.array`
 * `aid.Is.base64`
 * `aid.Is.number`

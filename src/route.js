@@ -4,7 +4,7 @@ const Path = require('path'),
     Is = require('./is');
 
 const {sep,relative,basename,dirname} = Path,
-    {fn,object,string,defined} = Is,
+    {fn,object,string,defined,array,undef} = Is,
     {promisify} = Util,
     glob = promisify(Glob),
     pattern = '**/*.js',
@@ -12,9 +12,7 @@ const {sep,relative,basename,dirname} = Path,
     dot = '.',
     ext = '.js',
     slash = '/',
-    index = 'index',
-    path_msg = 'path can\'t toString:',
-    method_msg = 'method can\'t toLowerCase:';
+    index = 'index';
 
 function toURI(path){
     return slash === sep?path:path.replace(sep,slash);
@@ -51,6 +49,24 @@ function resolveMethod(method){
         return method.toLowerCase();
 }
 
+function route (cache,path,method){
+    const p = resolvePath(path);
+    if(!string(p))
+        return;
+
+    const uri = cache[p];
+    if(!string(uri))
+        return;
+
+    const module = require(uri),
+        action = resolveMethod(method);
+    if(object(module))
+        return module[action];
+
+    if(fn(module))
+        return undef(action)?module:module(action);
+}
+
 module.exports = (cwd)=>{
     
     const fixed = toURI(relative(__dirname,cwd)),
@@ -58,17 +74,15 @@ module.exports = (cwd)=>{
             .then(_=>init(fixed,_));
 
     return async (ctx) => {
-        const {path,method} = ctx || {},
-            cache = await mappings;
-        let uri,module,action;
-        if(uri = cache[resolvePath(path)]){
-            module = require(uri);
-            action = resolveMethod(method);
-            if(object(module))
-                return module[action];
-            if(fn(module))
-                return module(action);
+        const cache = await mappings;
+
+        if(array(ctx))
+            return route(cache,...ctx);
+        if(object(ctx)){
+            const {path,method} = ctx;
+            return route(cache,path,method);
         }
+        return route(cache,ctx);
     };
 
 };
