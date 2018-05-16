@@ -9,6 +9,7 @@
         "testclean": "rm -rf ./coverage",
         "clean": "npm run testclean && rm -rf ./node_modules"
     },
+    "homepage": "https://github.com/kibamaple/node-aid",
     "author": "kiba.x.zhao <kiba.rain@qq.com>",
     "dependencies": {
         "is": "^3.2.1",
