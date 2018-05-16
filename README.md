@@ -57,7 +57,7 @@ exports.post = async ({p1,p2})=>{
     // 正常响应
     // status 200
     // body {table:...}
-    return [undefined,{table}];
+    return [200,{table}];
 }
 ```
 视图处理：(.../view/xview.js)

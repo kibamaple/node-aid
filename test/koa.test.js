@@ -455,7 +455,7 @@ describe('koa',()=>{
         expect(context).toBeCalledWith(undefined,state,files,fields,query);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
-        expect(_ctx.status).toBeUndefined();
+        expect(_ctx.status).toBe(200);
         expect(_ctx.body).toBeUndefined();
         expect(set).not.toHaveBeenCalled();
         expect(cookie).not.toHaveBeenCalled();

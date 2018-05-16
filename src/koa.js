@@ -7,8 +7,6 @@ const Context = require('./context'),
 const {defined,array,object,undef,integer} = Is;
 
 function respond (ctx,status,body,headers,cookies) {
-    if (integer(status))
-        ctx.status = status;
 
     if (object(headers))
         ctx.set(headers);
@@ -17,8 +15,8 @@ function respond (ctx,status,body,headers,cookies) {
         for (let args of cookies)
             ctx.cookies.set(...args);
 
-    if (!undef(body))
-        ctx.body = body;
+    ctx.status = integer(status)?status:200;
+    ctx.body = body;
 }
 
 function viewFn (_) {
@@ -43,7 +41,7 @@ module.exports = (routes,views) => {
             if(e !== ctx)
                 throw e;
         }
-        
+
         if(res === null)
             return respond(ctx);
         if(array(res))
