@@ -32,7 +32,7 @@ module.exports = (routes,views) => {
     return async (ctx,next)=>{
 
         const {query,request:{fields,files},state} = ctx,
-            context = Context(undefined,state,files,fields,query);
+            context = Context(undefined,state,query,files,fields);
         
         let res;
         try{

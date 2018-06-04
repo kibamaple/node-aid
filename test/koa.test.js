@@ -250,7 +250,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).not.toHaveBeenCalled();
         expect(_ctx.status).toBeUndefined();
         expect(_ctx.body).toBeUndefined();
@@ -298,7 +298,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
         expect(_ctx.status).toBeUndefined();
@@ -353,7 +353,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
         expect(_ctx.status).toBeUndefined();
@@ -402,7 +402,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
         expect(_ctx.status).toBeUndefined();
@@ -452,7 +452,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
         expect(_ctx.status).toBe(200);
@@ -508,7 +508,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
         expect(_ctx.status).toBe(status);
@@ -568,7 +568,7 @@ describe('koa',()=>{
         expect(handle).toHaveBeenCalledTimes(1);
         expect(handle).toBeCalledWith(rs,vs);
         expect(context).toHaveBeenCalledTimes(1);
-        expect(context).toBeCalledWith(undefined,state,files,fields,query);
+        expect(context).toBeCalledWith(undefined,state,query,files,fields);
         expect(fn).toHaveBeenCalledTimes(1);
         expect(fn).toBeCalledWith(_ctx,ctx);
         expect(_ctx.status).toBe(status);
