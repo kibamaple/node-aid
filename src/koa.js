@@ -15,8 +15,13 @@ function respond (ctx,status,body,headers,cookies) {
         for (let args of cookies)
             ctx.cookies.set(...args);
 
-    ctx.status = integer(status)?status:200;
-    ctx.body = body;
+    const _status = integer(status)?status:200;
+    if( _status != 200){
+        ctx.throw(_status,body);
+    }else{
+        ctx.status = _status;
+        ctx.body = body;
+    }
 }
 
 function viewFn (_) {
