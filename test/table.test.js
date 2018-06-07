@@ -1,4 +1,4 @@
-const Table = require('../src/table');
+const Table = require('@/table');
 
 describe('table',()=>{
 

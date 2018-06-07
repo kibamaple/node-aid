@@ -18,10 +18,10 @@ const routes = [Symbol('route1'),Symbol('route2'),Symbol('route3')],
 describe('koa',()=>{
 
     beforeAll(()=>{
-        jest.doMock('../src/context',()=>context,opts);
-        jest.doMock('../src/handle',()=>handle,opts);
-        jest.doMock('../src/route',()=>route,opts);
-        jest.doMock('../src/view',()=>view,opts);
+        jest.doMock('@/context',()=>context,opts);
+        jest.doMock('@/handle',()=>handle,opts);
+        jest.doMock('@/route',()=>route,opts);
+        jest.doMock('@/view',()=>view,opts);
     });
 
     afterEach(()=>{
@@ -32,10 +32,10 @@ describe('koa',()=>{
     });
 
     afterAll(()=>{
-        jest.dontMock('../src/context');
-        jest.dontMock('../src/handle');
-        jest.dontMock('../src/route');
-        jest.dontMock('../src/view');
+        jest.dontMock('@/context');
+        jest.dontMock('@/handle');
+        jest.dontMock('@/route');
+        jest.dontMock('@/view');
         jest.resetModules();
     });
 
@@ -48,7 +48,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockImplementationOnce(errorFn);
@@ -82,7 +82,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -122,7 +122,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -165,7 +165,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -215,7 +215,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -269,7 +269,7 @@ describe('koa',()=>{
                 set,cookies:{set:cookie}
             },
             fn = jest.fn(()=>{{throw _ctx;}}),
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -318,7 +318,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -373,7 +373,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -422,7 +422,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -478,7 +478,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);
@@ -536,7 +536,7 @@ describe('koa',()=>{
                 query,request:{fields,files},state,
                 set,cookies:{set:cookie}
             },
-            koa = require('../src/koa');
+            koa = require('@/koa');
         
         for(let _rs of rs)
             route.mockReturnValueOnce(_rs);

@@ -1,4 +1,4 @@
-const View = require('../src/view');
+const View = require('@/view');
 const error = new Error(),
     errorFn = ()=>{throw error;};
 

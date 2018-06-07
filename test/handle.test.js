@@ -1,4 +1,4 @@
-const Handle = require('../src/handle');
+const Handle = require('@/handle');
 
 const path = Symbol('path'),
     ctx = Symbol('ctx'),

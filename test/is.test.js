@@ -1,4 +1,4 @@
-const Is = require('../src/is');
+const Is = require('@/is');
 jest.resetModules();
 const {
     string,

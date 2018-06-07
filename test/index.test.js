@@ -10,28 +10,28 @@ const opts = {virtual: true},
 describe('index',()=>{
 
     beforeAll(()=>{
-        jest.doMock('../src/context',()=>context,opts);
-        jest.doMock('../src/handle',()=>handle,opts);
-        jest.doMock('../src/is',()=>is,opts);
-        jest.doMock('../src/route',()=>route,opts);
-        jest.doMock('../src/table',()=>table,opts);
-        jest.doMock('../src/koa',()=>koa,opts);
-        jest.doMock('../src/view',()=>view,opts);
+        jest.doMock('@/context',()=>context,opts);
+        jest.doMock('@/handle',()=>handle,opts);
+        jest.doMock('@/is',()=>is,opts);
+        jest.doMock('@/route',()=>route,opts);
+        jest.doMock('@/table',()=>table,opts);
+        jest.doMock('@/koa',()=>koa,opts);
+        jest.doMock('@/view',()=>view,opts);
     })
 
     afterAll(()=>{
-        jest.dontMock('../src/context');
-        jest.dontMock('../src/handle');
-        jest.dontMock('../src/is');
-        jest.dontMock('../src/route');
-        jest.dontMock('../src/table');
-        jest.dontMock('../src/koa');
-        jest.dontMock('../src/view');
+        jest.dontMock('@/context');
+        jest.dontMock('@/handle');
+        jest.dontMock('@/is');
+        jest.dontMock('@/route');
+        jest.dontMock('@/table');
+        jest.dontMock('@/koa');
+        jest.dontMock('@/view');
         jest.resetModules();
     });
 
     it('exports',()=>{
-        const module = require('../src/index'),
+        const module = require('@/index'),
             {Context,Handle,Is,Route,Table,View,Koa} = module;
         
         expect(Context).toBe(context);

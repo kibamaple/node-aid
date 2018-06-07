@@ -1,7 +1,7 @@
 {
     "name": "node-aid",
     "description": "node aid library",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "main": "src/index.js",
     "scripts": {
         "dev": "./node_modules/jest/bin/jest.js --watch",
@@ -12,13 +12,24 @@
     "homepage": "https://github.com/kibamaple/node-aid",
     "author": "kiba.x.zhao <kiba.rain@qq.com>",
     "dependencies": {
+        "xml2js": "^0.4.19",
         "is": "^3.2.1",
         "glob": "^7.1.2"
     },
     "devDependencies": {
-        "jest": "^22.4.3"
+        "jest": "^22.4.3",
+        "moment": "^2.22.2"
     },
     "engines": {
         "node": ">= 8.1.4"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json"
+        ],
+        "moduleNameMapper": {
+            "^@/(.*)$": "<rootDir>/src/$1"
+        }
     }
 }

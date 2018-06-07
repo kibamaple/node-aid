@@ -1,4 +1,4 @@
-const Context = require('../src/context');
+const Context = require('@/context');
 
 describe('context',()=>{
  

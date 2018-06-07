@@ -2,7 +2,7 @@ const glob = jest.fn(),
     opts = {virtual: true};
 
 jest.doMock('glob',()=>glob,opts);
-const Route = require('../src/route');
+const Route = require('@/route');
 jest.dontMock('glob');
 jest.resetModules();
 
