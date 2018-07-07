@@ -24,7 +24,7 @@ const {ENV} = process.env,
     {string,number,array,fn} = Is,
     {parse} = Querystring,
     {compile} = Handlebars,
-    render = compile('<form id="alipay" name="alipay" action="'+URL+'?_input_charset={{params.charset}}" method="post" accept-charset="{{params.charset}}" onsubmit="document.charset=\'{{params.charset}}\';">\n{{#each params as |value key|}}\n<input name="{{key}}" type="hidden" value="{{value}}" />\n{{/each}}\n</form>\n<script>document.forms[\'alipay\'].submit();</script>'),
+    render = compile('<form id="alipay" name="alipay" action="'+URL+'" method="post" accept-charset="{{params.charset}}" onsubmit="document.charset=\'{{params.charset}}\';">\n{{#each params as |value key|}}\n<input name="{{key}}" type="hidden" value="{{value}}" />\n{{/each}}\n</form>\n<script>document.forms[\'alipay\'].submit();</script>'),
     _exports = {TRADE_SUCCESS,TRADE_FINISHED,TRADE_CLOSED};
 
 function doSign (content,key,type,encoding){
