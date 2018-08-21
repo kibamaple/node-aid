@@ -16,7 +16,7 @@ function respond (ctx,status,body,headers,cookies) {
             ctx.cookies.set(...args);
 
     const _status = integer(status)?status:200;
-    if( _status != 200){
+    if( _status >= 400){
         ctx.throw(_status,body);
     }else{
         ctx.status = _status;
